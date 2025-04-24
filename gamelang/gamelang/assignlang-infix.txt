@@ -1,0 +1,31 @@
+Program ::= Exp
+
+Assg ::= Identifier '=' Exp
+       | Exp
+
+Exp ::= Exp '+' Term
+      | Exp '-' Term
+      | Term
+
+Term ::= Term '*' Factor
+        | Term '/' Factor
+        | Factor
+
+Factor ::= '-' Factor
+         | Factor '^' Factor
+         | '(' Exp ')'
+         | Number
+         | Variable
+
+Number ::= Digit
+         | DigitNotZero Digit+
+
+
+Variable ::= Identifier
+
+
+Digit   ::= [0-9]
+
+DigitNotZero ::= [1-9]
+
+Identifier ::= [a-zA-Z$_] [a-zA-Z0-9$_]*

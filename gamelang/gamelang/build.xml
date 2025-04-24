@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<project name="lang" default="parser">
+
+	<!-- ANTLR version -->
+	<property name="antlr.version" value="4.5" />
+
+	<!-- GameLang parser -->
+	<target name="gamelang-check-parser">
+		<condition property="gamelang.parser.uptodate">
+			<and>
+				<uptodate srcfile="src/gamelang/GameLang.g" targetfile="src/gamelang/parser/GameLangParser.java" />
+				<uptodate srcfile="src/gamelang/GameLang.g" targetfile="src/gamelang/parser/GameLangLexer.java" />
+				<uptodate srcfile="src/gamelang/GameLang.g" targetfile="src/gamelang/parser/GameLangListener.java" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="gamelang" depends="gamelang-check-parser" unless="gamelang.parser.uptodate">
+		<java jar="lib/antlr-${antlr.version}-complete.jar" dir="src/gamelang/" fork="true" failonerror="true">
+			<arg value="-o" />
+			<arg value="parser/" />
+			<arg value="-no-listener" />
+			<arg value="-package" />
+			<arg value="gamelang.parser; import static gamelang.AST.*" />
+			<arg value="GameLang.g" />
+		</java>
+	</target>
+
+	<target name="parser" depends="gamelang" >
+	</target>
+
+        <target name="compile" depends="parser">
+                <mkdir dir="build/classes"/>
+                <javac srcdir="src" destdir="build/classes">
+                        <classpath>
+                                <pathelement path="lib/antlr-4.5-complete.jar"/>
+                        </classpath>
+                </javac>
+        </target>
+
+        <target name="jar" depends="compile">
+                <mkdir dir="build/jar"/>
+                <jar destfile="build/jar/GameLang.jar" basedir="build/classes">
+                        <zipgroupfileset dir="lib" includes="antlr-4.5-complete.jar" />
+                        <manifest>
+                                <attribute name="Main-Class" value="gamelang.Interpreter"/>
+                        </manifest>
+                </jar>
+        </target>
+
+        <target name="run" depends="jar">
+                <java jar="build/jar/GameLang.jar" fork="true"/>
+        </target>
+
+        <target name="clean">
+                <delete dir="build"/>
+        </target>
+	
+</project>
